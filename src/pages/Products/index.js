@@ -11,20 +11,29 @@ import Header from "../../components/Header";
 import ProductList from "../../components/ProductList";
 import { useEffect, useState } from "react";
 import { getProducts, getCategories } from "../../utils/api";
+import Grid from "@mui/material/Grid2";
 
 export default function Products() {
   const [category, setCategory] = useState("");
+  const [orilist, setOriList] = useState([]);
   const [list, setList] = useState([]);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    getCategories(category).then((data) => {
-      setCategories(data);
-    });
-  }, [category]); // only when genre is changed
+    if (category) {
+      const filtered = orilist.filter(
+        (product) => product.category === category
+      );
+      setList(filtered);
+    } else {
+      setList(orilist);
+    }
+  }, [category, orilist]); // only when genre is changed
 
   useEffect(() => {
-    getProducts(category).then((data) => {
+    getCategories().then((data) => setCategories(data));
+    getProducts().then((data) => {
+      setOriList(data);
       setList(data);
     });
   }, []); // only when page first loaded
@@ -32,8 +41,6 @@ export default function Products() {
   const handleChange = (event) => {
     setCategory(event.target.value);
   };
-
-  console.log(list)
   return (
     <div>
       <Header />
@@ -46,7 +53,7 @@ export default function Products() {
           }}
         >
           <Typography style={{ fontWeight: 700 }} variant="h6" component="div">
-            Products        
+            Products
           </Typography>
           <Button variant="contained" color="success">
             Add New
@@ -69,11 +76,17 @@ export default function Products() {
             </Select>
           </FormControl>
         </div>
-        {list && list.length > 0 ? (
-          list.map((item) => (
-            <ProductList key={item._id} item={item} />
-            ))
-          ) : <Typography>No items yet.</Typography>}
+        <Grid
+          container
+          spacing={{ xs: 2, md: 3 }} // Adjust spacing between cards
+          columns={{ xs: 1, sm: 2, md: 4 }} // Define the total number of columns
+        >
+          {list && list.length > 0 ? (
+            list.map((item) => <ProductList key={item._id} item={item} />)
+          ) : (
+            <Typography>No items yet.</Typography>
+          )}
+        </Grid>
       </Container>
     </div>
   );
