@@ -1,93 +1,135 @@
-import {
-  Container,
-  Typography,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
-import Header from "../../components/Header";
-import ProductList from "../../components/ProductList";
-import { useEffect, useState } from "react";
-import { getProducts, getCategories } from "../../utils/api";
+import { useState, useEffect } from "react";
+import { Container, Button, Typography, Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import { InputLabel, MenuItem, FormControl, Select } from "@mui/material";
+import Header from "../../components/Header";
 
-export default function Products() {
-  const [category, setCategory] = useState("");
-  const [orilist, setOriList] = useState([]);
-  const [list, setList] = useState([]);
+import { getProducts } from "../../utils/api_products";
+import { getCategories } from "../../utils/api_categories";
+
+function Products() {
+  const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [category, setCategory] = useState("all");
 
   useEffect(() => {
-    if (category) {
-      const filtered = orilist.filter(
-        (product) => product.category === category
-      );
-      setList(filtered);
-    } else {
-      setList(orilist);
-    }
-  }, [category, orilist]); // only when genre is changed
-
-  useEffect(() => {
-    getCategories().then((data) => setCategories(data));
-    getProducts().then((data) => {
-      setOriList(data);
-      setList(data);
+    getProducts(category).then((data) => {
+      setProducts(data);
     });
-  }, []); // only when page first loaded
+  }, [category]);
 
-  const handleChange = (event) => {
-    setCategory(event.target.value);
-  };
+  useEffect(() => {
+    getCategories().then((data) => {
+      setCategories(data);
+    });
+  }, []);
+
   return (
-    <div>
+    <Container>
       <Header />
-      <Container>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "15px 0",
-          }}
-        >
-          <Typography style={{ fontWeight: 700 }} variant="h6" component="div">
-            Products
-          </Typography>
-          <Button variant="contained" color="success">
-            Add New
-          </Button>
-        </div>
-        <div>
-          <FormControl variant="filled" style={{ minWidth: 150 }}>
-            <InputLabel id="demo-simple-select-filled-label">
-              All Categories
-            </InputLabel>
-            <Select
-              labelId="demo-simple-select-filled-label"
-              id="demo-simple-select-filled"
-              value={category}
-              onChange={handleChange}
-            >
-              {categories.map((item) => (
-                <MenuItem value={item}>{item}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <Grid
-          container
-          spacing={{ xs: 2, md: 3 }} // Adjust spacing between cards
-          columns={{ xs: 1, sm: 2, md: 4 }} // Define the total number of columns
-        >
-          {list && list.length > 0 ? (
-            list.map((item) => <ProductList key={item._id} item={item} />)
-          ) : (
-            <Typography>No items yet.</Typography>
-          )}
-        </Grid>
-      </Container>
-    </div>
+      <Box
+        display={"flex"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        <Typography variant="h4">Products</Typography>
+        <Button variant="contained" color="success">
+          Add New
+        </Button>
+      </Box>
+      <Box
+        sx={{
+          padding: "10px 0",
+        }}
+      >
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel id="demo-simple-select-label">Category</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={category}
+            label="category"
+            onChange={(event) => setCategory(event.target.value)}
+          >
+            <MenuItem value="all">All Items</MenuItem>
+            {categories.map((category) => {
+              return <MenuItem value={category}>{category}</MenuItem>;
+            })}
+          </Select>
+        </FormControl>
+      </Box>
+      <Grid container spacing={2}>
+        {products.map((product) => (
+          <Grid key={product._id} size={{ xs: 12, sm: 12, md: 6, lg: 4 }}>
+            <Card variant="outlined" sx={{ borderRadius: "8px", boxShadow: 3 }}>
+              <CardContent>
+                <Typography variant="h6">{product.name}</Typography>
+                <Typography color="green" fontWeight="bold">
+                  ${product.price}
+                </Typography>
+                <Typography
+                  sx={{
+                    display: "inline-block",
+                    padding: "2px 8px",
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "12px",
+                    fontSize: "0.9rem",
+                    marginTop: "5px",
+                    textTransform: "capitalize",
+                  }}
+                  color="textSecondary"
+                >
+                  {product.category}
+                </Typography>
+              </CardContent>
+              <CardActions sx={{ display: "block", padding: "16px" }}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    marginBottom: "10px",
+                    backgroundColor: "#1976d2",
+                    textTransform: "none",
+                    "&:hover": { backgroundColor: "#115293" },
+                  }}
+                >
+                  Add to Cart
+                </Button>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  sx={{
+                    marginLeft: "0px !important",
+                  }}
+                >
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    sx={{ textTransform: "none", marginRight: "8px" }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    sx={{ textTransform: "none" }}
+                  >
+                    Delete
+                  </Button>
+                </Box>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
 }
+
+export default Products;

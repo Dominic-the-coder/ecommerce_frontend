@@ -1,13 +1,24 @@
-import * as React from "react";
-import { Typography, Divider, Box } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 
 function Header() {
   return (
-    <Box sx={{ textAlign: "center", pt: 5 }}>
-      <Typography style={{ fontWeight: 700 }} variant="h4" component="div">
-        Welcome to My Store
+    <Box
+      sx={{
+        padding: "40px 0 30px 0",
+        marginBottom: "30px",
+        borderBottom: "1px solid #000",
+      }}
+    >
+      <Typography
+        variant="h1"
+        align="center"
+        sx={{
+          fontSize: "36px",
+          fontWeight: "bold",
+        }}
+      >
+        Welcome To My Store
       </Typography>
-      <Divider sx={{ pt: 3 }}></Divider>
     </Box>
   );
 }
