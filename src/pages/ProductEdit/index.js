@@ -8,7 +8,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Header from "../../components/Header";
 import { toast } from "sonner";
-import { editProduct, getProduct } from "../../utils/api.js";
+import { editProduct, getProduct } from "../../utils/api_products";
 
 function ProductEdit() {
   const { id } = useParams();

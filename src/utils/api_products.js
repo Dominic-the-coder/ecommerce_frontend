@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "sonner";
 
-const API_URL = "http://localhost:5555";
+import { API_URL } from "../constants";
 
 // get products
 export const getProducts = async (category = "", page = 1) => {
@@ -62,15 +62,5 @@ export const deleteProduct = async (_id) => {
     return response.data;
   } catch (error) {
     toast.error(error.response.data.error);
-  }
-};
-
-//categories
-export const getCategories = async () => {
-  try {
-    const response = await axios.get(API_URL + "/categories");
-    return response.data;
-  } catch (error) {
-    console.log(error);
   }
 };

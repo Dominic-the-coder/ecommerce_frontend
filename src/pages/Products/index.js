@@ -10,9 +10,9 @@ import { ArrowRight, ArrowLeft } from "@mui/icons-material";
 import Header from "../../components/Header";
 import { toast } from "sonner";
 
-import { getProducts } from "../../utils/api.js";
-import { getCategories } from "../../utils/api.js";
-import { deleteProduct } from "../../utils/api.js";
+import { getProducts } from "../../utils/api_products.js";
+import { getCategories } from "../../utils/api_categories.js";
+import { deleteProduct } from "../../utils/api_products.js";
 
 function Products() {
   const navigate = useNavigate();

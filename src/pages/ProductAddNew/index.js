@@ -5,7 +5,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Header from "../../components/Header";
 import { toast } from "sonner";
-import { addNewProduct } from "../../utils/api.js";
+import { addNewProduct } from "../../utils/api_products";
 
 function ProductAddNew() {
   const navigate = useNavigate();
