@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import Products from "./pages/Products";
 import ProductAddNew from "./pages/ProductAddNew";
 import ProductEdit from "./pages/ProductEdit";
+import AddToCart from "./pages/AddToCart";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Products />} />
           <Route path="/products/new" element={<ProductAddNew />} />
           <Route path="/products/:id/edit" element={<ProductEdit />} />
+          <Route path="/products/cart" element={<AddToCart />} />
         </Routes>
       </BrowserRouter>
       <Toaster richColors position="top-right" />

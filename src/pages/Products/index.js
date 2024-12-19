@@ -51,6 +51,33 @@ function Products() {
     }
   };
 
+  // add item to local storage (HANDLER)
+  const handleAdd = async (item) => {
+    const stringProducts = localStorage.getItem("cart");
+    let cart = JSON.parse(stringProducts);
+    if (!cart) {
+      // if cart is inoccupied, set cart to empty array
+      cart = [];
+    }
+
+    const duplicateProduct = cart.find((product) => {
+      return item._id === product._id;
+    });
+
+    if (duplicateProduct) {
+      duplicateProduct.quantity += 1;
+    } else {
+      cart.push({
+        _id: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: 1,
+      });
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    toast.success("Product added to cart successfully!");
+  };
+
   return (
     <Container>
       <Header />
@@ -138,6 +165,7 @@ function Products() {
                       textTransform: "none",
                       "&:hover": { backgroundColor: "#115293" },
                     }}
+                    onClick={() => handleAdd(product)}
                   >
                     Add to Cart
                   </Button>
