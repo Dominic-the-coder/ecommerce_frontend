@@ -1,12 +1,10 @@
 import { Typography, Box, Button } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-export default function Header() {
-  // using useLocation and calling its function in a variable
+function Header(props) {
+  const { title = "Welcome To My Store" } = props;
   const location = useLocation();
-  const isActive = (path) => location.pathname === path;
 
-  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -22,24 +20,29 @@ export default function Header() {
           fontSize: "36px",
           fontWeight: "bold",
         }}
-        mt={3}
       >
-        {isActive("/") ? "Welcome to my Store" : "Cart"}
+        {title}
       </Typography>
-      <Box sx={{ display: "flex", justifyContent: "center" }} mt={2}>
+      <Box display="flex" justifyContent="center" gap={2} sx={{ marginTop: 1 }}>
         <Button
-          variant={isActive("/") ? "contained" : "outlined"}
-          onClick={() => {
-            navigate("/");
+          variant={location.pathname === "/" ? "contained" : "outlined"}
+          color="primary"
+          LinkComponent={Link}
+          to="/"
+          sx={{
+            padding: "10px 20px",
           }}
-          sx={{ marginRight: "10px" }}
         >
           Home
         </Button>
+
         <Button
-          variant={isActive("/products/cart") ? "contained" : "outlined"}
-          onClick={() => {
-            navigate("/products/cart");
+          variant={location.pathname === "/cart" ? "contained" : "outlined"}
+          color="primary"
+          LinkComponent={Link}
+          to="/cart"
+          sx={{
+            padding: "10px 20px",
           }}
         >
           Cart
@@ -48,3 +51,5 @@ export default function Header() {
     </Box>
   );
 }
+
+export default Header;

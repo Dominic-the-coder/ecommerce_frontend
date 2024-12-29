@@ -10,9 +10,10 @@ import { ArrowRight, ArrowLeft } from "@mui/icons-material";
 import Header from "../../components/Header";
 import { toast } from "sonner";
 
-import { getProducts } from "../../utils/api_products.js";
-import { getCategories } from "../../utils/api_categories.js";
-import { deleteProduct } from "../../utils/api_products.js";
+import { getProducts } from "../../utils/api_products";
+import { getCategories } from "../../utils/api_categories";
+import { deleteProduct } from "../../utils/api_products";
+import { AddToCart } from "../../utils/api_cart";
 
 function Products() {
   const navigate = useNavigate();
@@ -33,6 +34,12 @@ function Products() {
     });
   }, []);
 
+  const handleAddToCart = (product) => {
+    // trigger add to cart function
+    AddToCart(product);
+    toast.success(`${product.name} has been added to Cart`);
+  };
+
   const handleDelete = async (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this product?"
@@ -41,41 +48,15 @@ function Products() {
       const deleted = await deleteProduct(id);
       if (deleted) {
         // get the latest products data from the API again
-        getProducts(category, page).then((data) => {
-          setProducts(data);
-          toast.success("Product deleted successfully");
-        });
+        const latestProducts = await getProducts(category, page);
+        // update the products state with the latest data
+        setProducts(latestProducts);
+        // show success message
+        toast.success("Product deleted successfully");
       } else {
         toast.error("Failed to delete product");
       }
     }
-  };
-
-  // add item to local storage (HANDLER)
-  const handleAdd = async (item) => {
-    const stringProducts = localStorage.getItem("cart");
-    let cart = JSON.parse(stringProducts);
-    if (!cart) {
-      // if cart is inoccupied, set cart to empty array
-      cart = [];
-    }
-
-    const duplicateProduct = cart.find((product) => {
-      return item._id === product._id;
-    });
-
-    if (duplicateProduct) {
-      duplicateProduct.quantity += 1;
-    } else {
-      cart.push({
-        _id: item._id,
-        name: item.name,
-        price: item.price,
-        quantity: 1,
-      });
-    }
-    localStorage.setItem("cart", JSON.stringify(cart));
-    toast.success("Product added to cart successfully!");
   };
 
   return (
@@ -165,7 +146,9 @@ function Products() {
                       textTransform: "none",
                       "&:hover": { backgroundColor: "#115293" },
                     }}
-                    onClick={() => handleAdd(product)}
+                    onClick={() => {
+                      handleAddToCart(product);
+                    }}
                   >
                     Add to Cart
                   </Button>
