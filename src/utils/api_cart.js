@@ -64,3 +64,8 @@ export function getTotalCartPrice() {
   });
   return total.toFixed(2);
 }
+
+// clear the cart
+export function clearCart() {
+  localStorage.removeItem("cart");
+}

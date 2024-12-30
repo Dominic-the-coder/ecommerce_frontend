@@ -7,6 +7,7 @@ import ProductEdit from "./pages/ProductEdit";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import PaymentVerify from "./pages/PaymentVerify";
+import Orders from "./pages/Orders";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/verify-payment" element={<PaymentVerify />} />
+          <Route path="/orders" element={<Orders />} />
         </Routes>
       </BrowserRouter>
       <Toaster richColors position="top-right" />

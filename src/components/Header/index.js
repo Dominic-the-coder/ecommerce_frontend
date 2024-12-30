@@ -47,6 +47,18 @@ function Header(props) {
         >
           Cart
         </Button>
+
+        <Button
+          variant={location.pathname === "/orders" ? "contained" : "outlined"}
+          color="primary"
+          LinkComponent={Link}
+          to="/orders"
+          sx={{
+            padding: "10px 20px",
+          }}
+        >
+          My Orders
+        </Button>
       </Box>
     </Box>
   );
