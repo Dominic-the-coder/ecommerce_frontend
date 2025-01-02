@@ -59,6 +59,28 @@ function Header(props) {
         >
           My Orders
         </Button>
+        <Button
+          variant={location.pathname === "/login" ? "contained" : "outlined"}
+          color="primary"
+          LinkComponent={Link}
+          to="/login"
+          sx={{
+            padding: "10px 20px",
+          }}
+        >
+          Login
+        </Button>
+        <Button
+          variant={location.pathname === "/signup" ? "contained" : "outlined"}
+          color="primary"
+          LinkComponent={Link}
+          to="/signup"
+          sx={{
+            padding: "10px 20px",
+          }}
+        >
+          Sign Up
+        </Button>
       </Box>
     </Box>
   );
