@@ -5,7 +5,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Header from "../../components/Header";
 import { toast } from "sonner";
-import { signup } from "../../utils/api_signup";
+import { signup } from "../../utils/api_auth";
 
 function Signup() {
   const navigate = useNavigate();
@@ -28,7 +28,9 @@ function Signup() {
     // check if the account exists or not
     if (signupData) {
       // show success message
-      toast.success("You have created an account successfully");
+      toast.success(
+        "You have created an account successfully, Thank You For Chooosing Us :)"
+      );
       // redirect back to home page
       navigate("/login");
     }

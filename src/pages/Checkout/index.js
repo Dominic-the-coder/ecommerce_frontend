@@ -24,16 +24,36 @@ import Table from "@mui/material/Table";
 import { toast } from "sonner";
 import { validateEmail } from "../../utils/email";
 import { createOrder } from "../../utils/api_orders";
+import {
+  getUserToken,
+  getCurrentUser,
+  isUserLoggedIn,
+} from "../../utils/api_auth";
+import { useCookies } from "react-cookie";
 
 function Checkout() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [cookies] = useCookies(["currentUser"]);
+  const token = getUserToken(cookies);
+  const currentUser = getCurrentUser(cookies);
+  const [name, setName] = useState(
+    currentUser && currentUser.name ? currentUser.name : ""
+  );
+  const [email, setEmail] = useState(
+    currentUser && currentUser.email ? currentUser.email : ""
+  );
   const [loading, setLoading] = useState(false);
 
   const cart = getCart();
   const totalPrice = getTotalCartPrice();
+
+  /// check if user is logged in or not
+  useEffect(() => {
+    if (!isUserLoggedIn(cookies)) {
+      navigate("/login");
+    }
+  }, [cookies, navigate]);
 
   const doCheckout = async () => {
     // 1. make sure the name and email fields are filled
@@ -46,7 +66,7 @@ function Checkout() {
       // show loader
       setLoading(true);
       // 2. trigger the createOrder function
-      const response = await createOrder(name, email, cart, totalPrice);
+      const response = await createOrder(name, email, cart, totalPrice, token);
       // 3. get the billplz url from response
       const billplz_url = response.billplz_url;
       // 4. redirect the user to billplz payment page
@@ -81,7 +101,7 @@ function Checkout() {
                 required
                 fullWidth
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                disabled={true}
               />
             </Box>
 

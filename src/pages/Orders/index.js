@@ -16,31 +16,35 @@ import {
 import Header from "../../components/Header";
 import { toast } from "sonner";
 import { getOrders, updateOrder, deleteOrder } from "../../utils/api_orders";
+import { getUserToken, isAdmin } from "../../utils/api_auth";
+import { useCookies } from "react-cookie";
 
 function Orders() {
+  const [cookies] = useCookies(["currentUser"]);
+  const token = getUserToken(cookies);
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    getOrders().then((data) => {
+    getOrders(token).then((data) => {
       setOrders(data);
     });
   }, []);
 
   const handleStatusUpdate = async (_id, status) => {
-    const updatedOrder = await updateOrder(_id, status);
+    const updatedOrder = await updateOrder(_id, status, token);
     if (updatedOrder) {
       // fetch the updated orders from API
-      const updatedOrders = await getOrders();
+      const updatedOrders = await getOrders(token);
       setOrders(updatedOrders);
       toast.success("Order status has been updated");
     }
   };
 
   const handleOrderDelete = async (_id) => {
-    const response = await deleteOrder(_id);
+    const response = await deleteOrder(_id, token);
     if (response && response.status === "success") {
       // fetch the updated orders from API
-      const updatedOrders = await getOrders();
+      const updatedOrders = await getOrders(token);
       setOrders(updatedOrders);
       toast.success("Order has been deleted");
     }
@@ -62,7 +66,7 @@ function Orders() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.length > 0 ? (
+            {orders && orders.length > 0 ? (
               orders.map((order) => (
                 <TableRow key={order._id}>
                   <TableCell>
@@ -78,21 +82,25 @@ function Orders() {
                   <TableCell>${order.totalPrice.toFixed(2)}</TableCell>
                   <TableCell>
                     <FormControl fullWidth>
-                      {order.status === "pending" ? (
-                        <Select value={order.status} disabled={true}>
-                          <MenuItem value="pending">Pending</MenuItem>
-                        </Select>
+                      {isAdmin(cookies) ? (
+                        order.status === "pending" ? (
+                          <Select value={order.status} disabled={true}>
+                            <MenuItem value="pending">Pending</MenuItem>
+                          </Select>
+                        ) : (
+                          <Select
+                            value={order.status}
+                            onChange={(event) => {
+                              handleStatusUpdate(order._id, event.target.value);
+                            }}
+                          >
+                            <MenuItem value="paid">Paid</MenuItem>
+                            <MenuItem value="failed">Failed</MenuItem>
+                            <MenuItem value="completed">Completed</MenuItem>
+                          </Select>
+                        )
                       ) : (
-                        <Select
-                          value={order.status}
-                          onChange={(event) => {
-                            handleStatusUpdate(order._id, event.target.value);
-                          }}
-                        >
-                          <MenuItem value="paid">Paid</MenuItem>
-                          <MenuItem value="failed">Failed</MenuItem>
-                          <MenuItem value="completed">Completed</MenuItem>
-                        </Select>
+                        order.status
                       )}
                     </FormControl>
                   </TableCell>
@@ -100,17 +108,19 @@ function Orders() {
                     {order.paid_at ? order.paid_at : "Not Paid"}
                   </TableCell>
                   <TableCell>
-                    {order.status === "pending" ? (
-                      <Button
-                        variant="contained"
-                        color="error"
-                        disabled={order.status !== "pending"}
-                        onClick={() => {
-                          handleOrderDelete(order._id);
-                        }}
-                      >
-                        Delete
-                      </Button>
+                    {isAdmin(cookies) ? (
+                      order.status === "pending" ? (
+                        <Button
+                          variant="contained"
+                          color="error"
+                          disabled={order.status !== "pending"}
+                          onClick={() => {
+                            handleOrderDelete(order._id);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      ) : null
                     ) : null}
                   </TableCell>
                 </TableRow>
