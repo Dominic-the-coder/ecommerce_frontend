@@ -1,160 +1,149 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import Header from "../../components/Header";
 import {
   Container,
+  Typography,
   Box,
-  Button,
   TextField,
+  Button,
   Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
   TableRow,
+  TableBody,
+  TableHead,
+  TableContainer,
+  TableCell,
   Paper,
 } from "@mui/material";
-import Header from "../../components/Header";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { getUserToken, isAdmin } from "../../utils/api_auth";
 import { useCookies } from "react-cookie";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
-  addCategories,
-  deleteCategories,
   getCategories,
+  addNewCategory,
+  deleteCategory,
 } from "../../utils/api_categories";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 function Categories() {
+  const [categories, setCategories] = useState([]);
+  const [name, setName] = useState("");
   const navigate = useNavigate();
   const [cookies] = useCookies(["currentUser"]);
   const token = getUserToken(cookies);
-  const [category, setCategory] = useState("");
-  const [categories, setCategories] = useState([]);
 
-  // check if is admin or not
-  useEffect(() => {
-    if (!isAdmin(cookies)) {
-      navigate("/login");
-    }
-  }, [cookies, navigate]);
-
+  // get categories
   useEffect(() => {
     getCategories().then((data) => {
       setCategories(data);
     });
   }, []);
 
-  const handleFormAdd = async (event) => {
-    event.preventDefault();
-    // check for error
-    if (!category) {
+  // if is not admin, redirect to home page
+  useEffect(() => {
+    if (!isAdmin(cookies)) {
+      navigate("/");
+    }
+  }, [cookies, navigate]);
+
+  const handleFormSubmit = async () => {
+    //check for error
+    if (!name) {
       toast.error("Please fill out all the required fields");
     }
 
-    // trigger the add new product API
-    const newCategoriesData = await addCategories(category, token);
+    //trigger the add new category API
+    const newCategory = await addNewCategory(name, token);
 
-    // check if the newProductData exists or not
-    if (newCategoriesData) {
-      // show success message
-      toast.success("Product has been added successfully");
-      // redirect back to home page
-      navigate("/");
+    // check if the newCategory exist or not
+    if (newCategory) {
+      const newData = await getCategories();
+      setCategories(newData);
+      // clear the input field
+      setName("");
+      // show success error
+      toast.success("Category has been added successfully");
     }
   };
 
-  const handleDelete = async (id) => {
-      const confirmed = window.confirm(
-        "Are you sure you want to delete this product?"
-      );
-      if (confirmed) {
-        const deleted = await deleteCategories(id, token);
-        if (deleted) {
-          // get the latest products data from the API again
-          const latestCategories = await getCategories(category);
-          // update the products state with the latest data
-          setCategories(latestCategories);
-          // show success message
-          toast.success("Product deleted successfully");
-        } else {
-          toast.error("Failed to delete product");
-        }
+  const handleDelete = async (_id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this category?"
+    );
+    if (confirmed) {
+      const deleted = await deleteCategory(_id, token);
+      if (deleted) {
+        const latestCategories = await getCategories();
+        setCategories(latestCategories);
+        toast.success("Category deleted successfully");
+      } else {
+        toast.error("Failed to delete category");
       }
-    };
+    }
+  };
 
   return (
     <Container>
-      <Header title="Categories" />
-      <Box mb={2}>
-        <TextField
-          label="Category Name"
-          required
-          fullWidth
-          value={category}
-          onChange={(event) => setCategory(event.target.value)}
-        />
-      </Box>
-      <Button
-        variant="contained"
-        fullWidth
-        color="primary"
-        onClick={handleFormAdd}
-        sx={{ marginBottom: "20px" }}
-      >
-        Add
-      </Button>
+      <Header />
+      <Typography variant="h4" mb={4}>
+        Categories
+      </Typography>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table>
+          <TableCell>
+            <Box mb={2} display="flex">
+              <TextField
+                label="Category Name"
+                fullWidth
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                // v1
+                // onClick={handleFormSubmit}
+                // v2
+                onClick={() => handleFormSubmit()}
+              >
+                ADD
+              </Button>
+            </Box>
+          </TableCell>
+        </Table>
+
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell align="right">Action</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {categories.length > 0 ? (
-              categories.map((category) => (
-                <TableRow key={category._id}>
-                  <TableCell component="th" scope="row">
-                    {category.name}
-                  </TableCell>
-                  <TableCell align="right">
-                    <Button
-                      variant="contained"
-                      color="error"
-                      size="small"
-                      sx={{ textTransform: "none" }}
-                      onClick={() => {
-                        handleDelete(category._id);
-                        toast.success(
-                          `${category.name} has been removed from the cart`
-                        );
-                        navigate("/categories");
-                      }}
-                    >
-                      Remove
-                    </Button>
 
-                    <Button
-                      variant="contained"
-                      LinkComponent={Link}
-                      to={`/categories/${category._id}/edit`}
-                      color="primary"
-                      size="small"
-                      sx={{ textTransform: "none" }}
-                    >
-                      Edit
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
+          <TableBody>
+            {categories.map((category) => (
               <TableRow>
-                <TableCell colSpan={5} align="center">
-                  No Categories Added Yet!
+                <TableCell>{category.name}</TableCell>
+                <TableCell align="right">
+                  <Button
+                    variant="contained"
+                    LinkComponent={Link}
+                    color="primary"
+                    size="small"
+                    to={`/categories/${category._id}`}
+                  >
+                    EDIT
+                  </Button>{" "}
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={() => handleDelete(category._id)}
+                  >
+                    DELETE
+                  </Button>
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </TableContainer>

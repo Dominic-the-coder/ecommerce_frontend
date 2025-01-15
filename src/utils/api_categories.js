@@ -1,52 +1,46 @@
 import axios from "axios";
 import { toast } from "sonner";
+
 import { API_URL } from "../constants";
 
-// get categories
+// (public api)
 export const getCategories = async () => {
   try {
     const response = await axios.get(API_URL + "/categories");
     return response.data;
   } catch (error) {
-    toast.error(error.response.data.error);
+    console.log(error);
   }
 };
 
-// get category
-export const getCategory = async (_id) => {
+export const getCategory = async (id) => {
   try {
-    const response = await axios.get(API_URL + "/categories/" + _id);
+    const response = await axios.get(API_URL + "/categories/" + id);
     return response.data;
   } catch (error) {
     toast.error(error.response.data.error);
   }
 };
 
-// add categories
-export const addCategories = async (name, token) => {
+export const addNewCategory = async (name, token) => {
+  // console.log(token);
   try {
     const response = await axios.post(
       API_URL + "/categories",
-      {
-        name: name,
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      }
+      { name },
+      { headers: { Authorization: "Bearer " + token } }
     );
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     toast.error(error.response.data.error);
   }
 };
 
-// update categories
-export const updateCategories = async (_id, name, token) => {
+export const updateCategory = async (id, name, token) => {
   try {
     const response = await axios.put(
-      API_URL + `/categories/${_id}`,
+      API_URL + "/categories/" + id,
       {
         name,
       },
@@ -56,20 +50,21 @@ export const updateCategories = async (_id, name, token) => {
         },
       }
     );
+    console.log(response.data);
     return response.data;
   } catch (error) {
     toast.error(error.response.data.error);
   }
 };
 
-// delete categories
-export const deleteCategories = async (_id, token) => {
+export const deleteCategory = async (id, token) => {
   try {
-    const response = await axios.delete(API_URL + `/categories/${_id}`, {
+    const response = await axios.delete(API_URL + "/categories/" + id, {
       headers: {
         Authorization: "Bearer " + token,
       },
     });
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     toast.error(error.response.data.error);

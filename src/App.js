@@ -10,9 +10,9 @@ import Checkout from "./pages/Checkout";
 import PaymentVerify from "./pages/PaymentVerify";
 import Orders from "./pages/Orders";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import SignUp from "./pages/Signup";
 import Categories from "./pages/Categories";
-import CategoriesEdit from "./pages/CategoriesEdit";
+import CategoryEdit from "./pages/CategoryEdit";
 
 function App() {
   return (
@@ -29,9 +29,9 @@ function App() {
             <Route path="/verify-payment" element={<PaymentVerify />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/categories" element={<Categories />} />
-            <Route path="/categories/:id/edit" element={<CategoriesEdit />} />
+            <Route path="/categories/:id" element={<CategoryEdit />} />
           </Routes>
         </BrowserRouter>
         <Toaster richColors position="top-right" />
